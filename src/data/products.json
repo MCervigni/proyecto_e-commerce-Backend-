@@ -96,7 +96,7 @@
     "price": 18000,
     "status": true,
     "category": "bolsters",
-    "thumbnail": "noImg"
+    "thumbnail": "https://i.ibb.co/gzL3JZF/Bolster-Red.png"
   },
   {
     "id": 10,
@@ -141,37 +141,5 @@
     "status": true,
     "category": "cintos",
     "thumbnail": "https://i.ibb.co/XXF3K2P/Cinto.png"
-  },
-  {
-    "id": "14",
-    "title": "Bolster Red",
-    "description": "Cilindro de tela de algodón relleno de estopa. Elemento versátil por la variedad de usos. Es utilizado como apoyo relajante para las piernas cansadas, cinturas doloridas, o bien como descanso. Aporta altura para realizar posturas con mayor armonía. Color: rojo.",
-    "code": "BR001",
-    "price": 18000,
-    "status": true,
-    "stock": 3,
-    "category": "bolsters",
-    "thumbnails": []
-  },
-  {
-    "id": "15",
-    "title": "Bolster Red",
-    "description": "Cilindro de tela de algodón relleno de estopa. Elemento versátil por la variedad de usos. Es utilizado como apoyo relajante para las piernas cansadas, cinturas doloridas, o bien como descanso. Aporta altura para realizar posturas con mayor armonía. Color: rojo.",
-    "code": "BR001",
-    "price": 18000,
-    "status": true,
-    "stock": 3,
-    "category": "bolsters",
-    "thumbnails": []
-  },
-  {
-    "id": "19",
-    "title": "Mat Green",
-    "description": "Mat de yoga de 4mm confeccionado en goma antideslizante, proporciona estabilidad al practicante de yoga en la tracción. Funciona como aislante térmico. Color: verde.",
-    "code": "MG001",
-    "price": 35000,
-    "status": true,
-    "stock": 9,
-    "category": "mats"
   }
 ]

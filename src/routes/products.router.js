@@ -27,7 +27,7 @@ router.get("/:pid", async (req, res) => {
   let { pid } = req.params;
   pid = Number(pid);
   if (isNaN(pid)) {
-    return res.status(404).json({ error: `El id debe ser numérico` });
+    return res.status(400).json({ error: `El id debe ser numérico` });
   }
   try {
     const product = await productManager.getProductById(pid);
@@ -44,18 +44,9 @@ router.get("/:pid", async (req, res) => {
 
 // Ruta para agregar un nuevo producto
 router.post("/", async (req, res) => {
-  const {
-    title,
-    description,
-    code,
-    price,
-    status = true,
-    stock,
-    category,
-    thumbnails,
-  } = req.body;
+  const { title, description, code, price, stock, category, thumbnails } =
+    req.body;
 
-  // Validar campos obligatorios
   if (
     !title ||
     !description ||
@@ -64,13 +55,13 @@ router.post("/", async (req, res) => {
     stock === undefined ||
     !category
   ) {
-    return res
-      .status(400)
-      .json({ error: "Todos los campos requeridos deben ser completados" });
+    return res.status(400).json({
+      error:
+        "title | description | code | price | stock -> son campos obligatorios",
+    });
   }
 
   try {
-    // Generar un nuevo ID basado en el mayor ID existente
     const products = await productManager.getProducts();
     const maxId = products.reduce(
       (max, product) => Math.max(max, Number(product.id)),
@@ -78,8 +69,13 @@ router.post("/", async (req, res) => {
     );
     const newId = maxId + 1;
 
+    const codeExists = products.find((product) => product.code === code);
+    if (codeExists) {
+      return res.status(400).json({ error: "El código ya existe" });
+    }
+
     const newProduct = await productManager.addProduct({
-      id: newId.toString(),
+      id: newId,
       title,
       description,
       code,
@@ -87,7 +83,7 @@ router.post("/", async (req, res) => {
       status: true,
       stock: Number(stock),
       category,
-      thumbnails,
+      thumbnails: thumbnails || [],
     });
     return res
       .status(201)
@@ -122,6 +118,13 @@ router.put("/:pid", async (req, res) => {
         .status(404)
         .json({ error: `No existe producto con id ${pid}` });
     }
+    let existingProduct = products.find((p) => p.code === updatedProduct.code);
+    if (existingProduct) {
+      return res
+        .status(400)
+        .json({ error: `Ya existe un producto con el código ${code}` });
+    }
+
     return res
       .status(200)
       .json({ message: "Producto actualizado exitosamente", updatedProduct });

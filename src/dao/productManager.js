@@ -27,6 +27,10 @@ export class ProductManager {
   async getProductById(id) {
     try {
       const products = await this.getProducts();
+      const index = products.findIndex((p) => p.id === id);
+      if (index === -1) {
+        throw new Error(`No se encontró un producto con ID ${id}`);
+      }
       const product = products.find((p) => p.id === id);
       return product || null;
     } catch (error) {
@@ -37,13 +41,41 @@ export class ProductManager {
   // Método para agregar un producto
   async addProduct(product) {
     try {
+      const {
+        title,
+        description,
+        code,
+        price,
+        stock,
+        category,
+        thumbnails,
+      } = product;
+
+      if (!title || !description || !code || !price || !stock || !category) {
+        throw new Error(
+          "Todos los campos excepto thumbnails son obligatorios."
+        );
+      }
+
       const products = await this.getProducts();
+
+      if (products.some((p) => p.code === code)) {
+        throw new Error(`El producto con código ${code} ya existe.`);
+      }
+
       const newId =
         products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1;
 
       const newProduct = {
         id: newId,
-        ...product,
+        title,
+        description,
+        code,
+        price,
+        status: true,
+        stock,
+        category,
+        thumbnails,
       };
 
       products.push(newProduct);
@@ -60,9 +92,13 @@ export class ProductManager {
     try {
       const products = await this.getProducts();
       const index = products.findIndex((p) => p.id === id);
-       products[index] = {
+      if (index === -1) {
+        throw new Error(`No se encontró un producto con ID ${id}`);
+      }
+      products[index] = {
         ...products[index],
         ...updates,
+        id,
       };
 
       await this.#saveToFile(products);
