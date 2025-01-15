@@ -22,17 +22,6 @@
     "thumbnail": "https://i.ibb.co/jhTX5ND/Mat-Green.png"
   },
   {
-    "id": 3,
-    "stock": 11,
-    "title": "Mat Purple",
-    "description": "Mat de yoga de 4mm confeccionado en goma antideslizante, proporciona estabilidad al practicante de yoga en la tracción. Funciona como aislante térmico. Color: violeta.",
-    "code": "MP001",
-    "price": 35000,
-    "status": true,
-    "category": "mats",
-    "thumbnail": "https://i.ibb.co/809v6VW/Mat-Purple.png"
-  },
-  {
     "id": 4,
     "stock": 6,
     "title": "Mat Corcho",
