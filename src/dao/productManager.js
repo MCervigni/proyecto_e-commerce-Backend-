@@ -27,11 +27,10 @@ export class ProductManager {
   async getProductById(id) {
     try {
       const products = await this.getProducts();
-      const index = products.findIndex((p) => p.id === id);
-      if (index === -1) {
+      const product = products.find((p) => p.id === id);
+      if (!product) {
         throw new Error(`No se encontró un producto con ID ${id}`);
       }
-      const product = products.find((p) => p.id === id);
       return product || null;
     } catch (error) {
       throw new Error("Error al buscar el producto: " + error.message);
@@ -41,21 +40,8 @@ export class ProductManager {
   // Método para agregar un producto
   async addProduct(product) {
     try {
-      const {
-        title,
-        description,
-        code,
-        price,
-        stock,
-        category,
-        thumbnails,
-      } = product;
-
-      if (!title || !description || !code || !price || !stock || !category) {
-        throw new Error(
-          "Todos los campos excepto thumbnails son obligatorios."
-        );
-      }
+      const { title, description, code, price, stock, category, thumbnail } =
+        product;
 
       const products = await this.getProducts();
 
@@ -75,7 +61,7 @@ export class ProductManager {
         status: true,
         stock,
         category,
-        thumbnails,
+        thumbnail,
       };
 
       products.push(newProduct);

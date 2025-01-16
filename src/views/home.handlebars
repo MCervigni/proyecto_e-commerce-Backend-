@@ -1,8 +1,8 @@
-<h2>Home Page</h2>
+<h1>Home Page</h1>
 <hr>
-<h3>Listado de Productos</h3>
+<h2>Listado de Productos</h2>
 <ul>
   {{#each products}}
-    <li>{{this.title}} - ${{this.price}}</li>
+    <li><strong>{{this.title}}</strong> | Precio:<em><strong>$ {{this.price}}</strong></em></li>
   {{/each}}
 </ul>

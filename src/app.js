@@ -10,14 +10,14 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
-/* app.use(express.json());
-app.use(express.urlencoded({ extended: true })); */
-
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
-app.use(express.static("public"));
+app.use(express.static("src/public"));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/", viewsRouter);
 app.use("/api/products", productsRouter);

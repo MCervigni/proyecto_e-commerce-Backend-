@@ -30,19 +30,17 @@ router.get("/:pid", async (req, res) => {
   }
   try {
     const product = await productManager.getProductById(pid);
-    if (!product) {
-      return res
-        .status(404)
-        .json({ error: `No existe producto con ID ${pid}` });
-    }
     return res.status(200).json({ product });
   } catch (error) {
+    if (error.message.includes(`No se encontró un producto con ID`)) {
+      return res.status(404).json({ error: error.message });
+    }
     processServerError(res, error);
   }
 });
 
 // Ruta para agregar un nuevo producto
-/* router.post("/", async (req, res) => {
+router.post("/", async (req, res) => {
   const { title, description, code, price, stock, category, thumbnails } =
     req.body;
 
@@ -61,55 +59,22 @@ router.get("/:pid", async (req, res) => {
   }
 
   try {
-    const products = await productManager.getProducts();
-    const maxId = products.reduce(
-      (max, product) => Math.max(max, Number(product.id)),
-      0
-    );
-    const newId = maxId + 1;
-
-    const codeExists = products.find((product) => product.code === code);
-    if (codeExists) {
-      return res.status(400).json({ error: "El código ya existe" });
-    }
-
-    const newProduct = await productManager.addProduct({
-      id: newId,
-      title,
-      description,
-      code,
-      price: Number(price),
-      status: true,
-      stock: Number(stock),
-      category,
-      thumbnails: thumbnails || [],
-    });
-    return res
-      .status(201)
-      .json({ message: "Producto agregado exitosamente", newProduct });
-  } catch (error) {
-    processServerError(res, error);
-  }
-}); */
-
-// Ruta para agregar un nuevo producto
-router.post("/", async (req, res) => {
-  const { title, description, code, price, stock, category, thumbnails } = req.body;
-
-  if (!title || !description || !code || price === undefined || stock === undefined || !category) {
-    return res.status(400).json({
-      error: "title | description | code | price | stock -> son campos obligatorios",
-    });
-  }
-
-  try {
     const newProduct = await productManager.addProduct(req.body);
     const io = req.app.get('socketio');
     const products = await productManager.getProducts();
     io.emit('updateProducts', products);
-    res.status(201).json(newProduct);
+
+    let response = { newProduct };
+    if (req.body.id) {
+      response.warning = "El ID del producto se genera automáticamente. El ID proporcionado fue ignorado.";
+    }
+
+    res.status(201).json(response);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (error.message.includes('El producto con código')) {
+      return res.status(400).json({ error: error.message });
+    }
+    processServerError(res, error);
   }
 });
 
@@ -123,28 +88,10 @@ router.put("/:pid", async (req, res) => {
 
   const updatedFields = req.body;
   if (!updatedFields || Object.keys(updatedFields).length === 0) {
-    return res.status(400).json({ error: "No se proporcionaron campos para actualizar" });
+    return res
+      .status(400)
+      .json({ error: "No se proporcionaron campos para actualizar" });
   }
-
-  try {
-    const updatedProduct = await productManager.updateProduct(pid, updatedFields);
-    const io = req.app.get('socketio');
-    const products = await productManager.getProducts();
-    io.emit('updateProducts', products);
-    res.status(200).json(updatedProduct);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/* // Ruta para actualizar un producto por su ID
-router.put("/:pid", async (req, res) => {
-  let { pid } = req.params;
-  pid = Number(pid);
-  if (isNaN(pid)) {
-    return res.status(404).json({ error: `El ID debe ser numérico` });
-  }
-  const updatedFields = req.body;
 
   if (updatedFields.id) {
     return res
@@ -153,29 +100,32 @@ router.put("/:pid", async (req, res) => {
   }
 
   try {
+    const products = await productManager.getProducts();
+    const existingProduct = products.find(
+      (p) => p.code === updatedFields.code && p.id !== pid
+    );
+    if (existingProduct) {
+      return res.status(400).json({
+        error: `Ya existe un producto con el código ${updatedFields.code} en DB. Tiene ID= ${existingProduct.id}`,
+      });
+    }
+
     const updatedProduct = await productManager.updateProduct(
       pid,
       updatedFields
     );
-    if (!updatedProduct) {
-      return res
-        .status(404)
-        .json({ error: `No existe producto con ID ${pid}` });
-    }
-    let existingProduct = products.find((p) => p.code === updatedProduct.code);
-    if (existingProduct) {
-      return res.status(400).json({
-        error: `Ya existe un producto con el código ${code} en DB. Tiene ID= ${existingProduct.id} `,
-      });
-    }
-
-    return res
+    const io = req.app.get("socketio");
+    io.emit("updateProducts", products);
+    res
       .status(200)
       .json({ message: "Producto actualizado exitosamente", updatedProduct });
   } catch (error) {
+    if (error.message.includes("No se encontró un producto con ID")) {
+      return res.status(404).json({ error: error.message });
+    }
     processServerError(res, error);
   }
-}); */
+});
 
 // Ruta para eliminar un producto por su ID
 router.delete("/:pid", async (req, res) => {
@@ -187,32 +137,14 @@ router.delete("/:pid", async (req, res) => {
 
   try {
     const deletedProduct = await productManager.deleteProduct(pid);
-    const io = req.app.get('socketio');
+    const io = req.app.get("socketio");
     const products = await productManager.getProducts();
-    io.emit('updateProducts', products);
-    res.status(200).json(deletedProduct);
+    io.emit("updateProducts", products);
+    res.status(200).json({ message: "Producto eliminado exitosamente", deletedProduct});
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/* 
-// Ruta para eliminar un producto por su ID
-router.delete("/:pid", async (req, res) => {
-  let { pid } = req.params;
-  pid = Number(pid);
-  if (isNaN(pid)) {
-    return res.status(404).json({ error: `El ID debe ser numérico` });
-  }
-  try {
-    const deletedProduct = await productManager.deleteProduct(pid);
-    if (!deletedProduct) {
-      return res
-        .status(404)
-        .json({ error: `No existe producto con ID ${pid}` });
+    if (error.message.includes("No se encontró un producto con ID")) {
+      return res.status(404).json({ error: error.message });
     }
-    return res.status(200).json({ message: "Producto eliminado exitosamente" });
-  } catch (error) {
     processServerError(res, error);
   }
-}); */
+});

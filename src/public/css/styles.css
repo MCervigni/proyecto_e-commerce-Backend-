@@ -1,0 +1,16 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+  font-family: sans-serif;
+  line-height: 1.5;
+  margin: 20px;
+}
+
+/* Estilo listado */
+li {
+  list-style: none;
+  margin-bottom: 2px;
+}

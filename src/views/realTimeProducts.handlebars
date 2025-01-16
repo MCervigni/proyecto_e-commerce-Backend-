@@ -1,7 +1,7 @@
 <h1>Real Time Products</h1>
 <ul id="products-list">
   {{#each products}}
-    <li>{{this.title}} - ${{this.price}}</li>
+    <li><strong>{{this.title}}</strong> | Precio:<em><strong>$ {{this.price}}</strong></em></li>
   {{/each}}
 </ul>
 <script src="/socket.io/socket.io.js"></script>
@@ -12,7 +12,7 @@
     productsList.innerHTML = '';
     products.forEach(product => {
       const li = document.createElement('li');
-      li.textContent = `${product.name} - $${product.price}`;
+      li.innerHTML = `<strong>${product.title}</strong> | <em>Precio:</em> <strong>$${product.price}</strong>`;
       productsList.appendChild(li);
     });
   });
