@@ -4,7 +4,7 @@ import { ProductManager } from "../dao/productManager.js";
 const productManager = new ProductManager("./src/data/products.json");
 export const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/products", async (req, res) => {
   const products = await productManager.getProducts();
   res.render("home", { title: "Home", products });
 });
