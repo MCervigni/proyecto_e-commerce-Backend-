@@ -1,8 +1,56 @@
 <h1>Home Page</h1>
-<hr>
+
+<div class="cartInput-container">
+  <label for="cartId">Carrito:</label>
+  <input type="text" id="cartId" placeholder="ID del Carrito" />
+</div>
+<hr />
 <h2>Listado de Productos</h2>
-<ul>
+<div>
   {{#each products}}
-    <li><strong>{{this.title}}</strong> | Precio:<em><strong>$ {{this.price}}</strong></em></li>
+    <div class="product-container">
+      <div class="product-info">
+        <strong>{{this.title}}</strong><br />
+        Precio:
+        <em><strong>${{this.price}}</strong></em><br />
+        Código:
+        {{this.code}}<br />
+        Stock:
+        {{this.stock}}
+      </div>
+      <div class="product-description">
+        {{this.description}}
+      </div>
+      <div class="product-image">
+        {{#each this.thumbnails}}
+          <img src="{{this}}" alt="Imagen del producto" />
+        {{/each}}
+      </div>
+      <div class="product-actions">
+        <button
+          class="add-to-cart-btn"
+          onclick="addToCart('{{this._id}}')"
+        >Agregar al carrito</button>
+      </div>
+    </div>
   {{/each}}
-</ul>
+</div>
+
+<br />
+<a href="/products?page=1">Pág.1</a>
+
+{{#if hasPrevPage}}
+  <a href="/products?page={{prevPage}}">Pág.Ant.</a>
+{{else}}
+  <span class="disabled">Pág.Ant.</span>
+{{/if}}
+
+{{#if hasNextPage}}
+  <a href="/products?page={{nextPage}}">Pág.Sig.</a>
+{{else}}
+  <span class="disabled">Pág.Sig.</span>
+{{/if}}
+
+<a href="/products?page={{totalPages}}">Ult.Pág</a>
+
+<script src="/js/products.js"></script>
